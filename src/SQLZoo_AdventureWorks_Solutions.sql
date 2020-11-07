@@ -40,7 +40,8 @@ WHERE
 
 /*
 4.
-Give the CompanyName of those customers with orders over $100000. Include the subtotal plus tax plus freight.
+Give the CompanyName of those customers with orders over $100000.
+Include the subtotal plus tax plus freight.
  */
 
 SELECT
@@ -72,7 +73,8 @@ WHERE
 
 /*
 6.
-A "Single Item Order" is a customer order where only one item is ordered. Show the SalesOrderID and the UnitPrice for every Single Item Order.
+A "Single Item Order" is a customer order where only one item is ordered.
+Show the SalesOrderID and the UnitPrice for every Single Item Order.
  */
 
 SELECT
@@ -84,7 +86,8 @@ WHERE
 
 /*
 7.
-Where did the racing socks go? List the product name and the CompanyName for all Customers who ordered ProductModel 'Racing Socks'.
+Where did the racing socks go? List the product name and the CompanyName for all
+Customers who ordered ProductModel 'Racing Socks'.
  */
 
 SELECT
@@ -118,4 +121,43 @@ INNER JOIN
 WHERE
   ProductModelProductDescription.Culture='fr' and Product.ProductID=736
 
+/*
+9.
+Use the SubTotal value in SaleOrderHeader to list orders from the largest to the smallest.
+For each order show the CompanyName and the SubTotal and the total weight of the order.
+ */
 
+SELECT
+  Customer.CompanyName, SalesOrderHeader.SubTotal, SUM(SalesOrderDetail.OrderQty*Product.Weight)
+FROM
+  Customer
+INNER JOIN
+  SalesOrderHeader ON SalesOrderHeader.CustomerID=Customer.CustomerID
+INNER JOIN
+  SalesOrderDetail ON SalesOrderDetail.SalesOrderID=SalesOrderHeader.SalesOrderID
+INNER JOIN
+  Product ON Product.ProductID=SalesOrderDetail.ProductID
+GROUP BY
+  Customer.CompanyName, SalesOrderHeader.SubTotal
+ORDER BY
+  SalesOrderHeader.SubTotal DESC;
+
+/*
+10.
+How many products in ProductCategory 'Cranksets' have been sold to an address in 'London'?
+ */
+
+SELECT
+  COUNT(SalesOrderDetail.OrderQty)
+FROM
+  ProductCategory
+INNER JOIN
+  Product on Product.ProductCategoryID=ProductCategory.ProductCategoryID
+INNER JOIN
+  SalesOrderDetail on SalesOrderDetail.ProductID=Product.ProductID
+INNER JOIN
+  SalesOrderHeader on SalesOrderHeader.SalesOrderID=SalesOrderDetail.SalesOrderID
+INNER JOIN
+  Address on Address.AddressID=SalesOrderHeader.ShipToAddressID
+WHERE
+  ProductCategory.Name='Cranksets' AND Address.City='London'
